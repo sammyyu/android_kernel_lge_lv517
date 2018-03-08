@@ -2422,13 +2422,9 @@ static int synaptics_notify(struct device *dev, ulong event, void *data)
 
 static ssize_t show_pen_support(struct device *dev, char *buf)
 {
-	struct synaptics_data *d = to_synaptics_data(dev);
 	int ret = 0;
 
-	if ((synaptics_is_product(d, "PLG632", 6) || synaptics_is_product(d, "PLG643", 6)))
-		ret += snprintf(buf + ret, PAGE_SIZE - ret, "%d\n", 1);
-	else
-		ret += snprintf(buf + ret, PAGE_SIZE - ret, "%d\n", 0);
+	ret += snprintf(buf + ret, PAGE_SIZE - ret, "%d\n", 1);
 
 	return ret;
 }

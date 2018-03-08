@@ -2573,13 +2573,6 @@ static int __iw_set_genie(struct net_device *dev,
         hddLog(VOS_TRACE_LEVEL_INFO, "%s: IE[0x%X], LEN[%d]",
             __func__, elementId, eLen);
 
-        if (remLen < eLen) {
-            hddLog(LOGE, "Remaining len: %u less than ie len: %u",
-                   remLen, eLen);
-            ret = -EINVAL;
-            goto exit;
-        }
-
         switch ( elementId )
          {
             case IE_EID_VENDOR:
@@ -2662,11 +2655,8 @@ static int __iw_set_genie(struct net_device *dev,
                 hddLog (LOGE, "%s Set UNKNOWN IE %X",__func__, elementId);
                 goto exit;
     }
+        genie += eLen;
         remLen -= eLen;
-
-        /* Move genie only if next element is present */
-        if (remLen >= 2)
-            genie += eLen;
     }
 
 exit:
@@ -5209,19 +5199,10 @@ int wlan_hdd_set_proximity(int set_value, tHalHandle hal)
 
         txPwr = (int8)(hwCalTxPower & 0x00FF);
         txPwr = txPwr/10;
-/* http://mlm.lge.com/di/browse/WIFI-3106
-     Fix QCT Power reduction bug, case #02795445
         if (txPwr < TX_PWR_MIN)
             txPwr = TX_PWR_MIN;
         if (txPwr > TX_PWR_MAX)
             txPwr = TX_PWR_MAX;
-*/
-       if (txPwr == 0)
-           txPwr = TX_PWR_DEF;
-       else if (txPwr < TX_PWR_MIN)
-           txPwr = TX_PWR_MIN;
-       else if (txPwr > TX_PWR_MAX)
-           txPwr = TX_PWR_MAX;
 
         if (sme_SetMaxTxPowerPerBand(eCSR_BAND_24, txPwr, hal) !=
                                 eHAL_STATUS_SUCCESS) {
@@ -5232,19 +5213,10 @@ int wlan_hdd_set_proximity(int set_value, tHalHandle hal)
 
         txPwr = (int8)((hwCalTxPower >> 8) & 0x00FF);
         txPwr /= 10;
-/* http://mlm.lge.com/di/browse/WIFI-3106
-     Fix QCT Power reduction bug, case #02795445
         if (txPwr < TX_PWR_MIN)
             txPwr = TX_PWR_MIN;
         if (txPwr > TX_PWR_MAX)
             txPwr = TX_PWR_MAX;
-*/
-        if (txPwr == 0)
-            txPwr = TX_PWR_DEF;
-        else if (txPwr < TX_PWR_MIN)
-           txPwr = TX_PWR_MIN;
-        else if (txPwr > TX_PWR_MAX)
-             txPwr = TX_PWR_MAX;
 
         if (sme_SetMaxTxPowerPerBand(eCSR_BAND_5G, txPwr, hal) !=
                                 eHAL_STATUS_SUCCESS) {
